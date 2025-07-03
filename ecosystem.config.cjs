@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   apps: [{
     name: 'lk-post-creator',
     script: 'src/server.js',
