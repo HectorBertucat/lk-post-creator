@@ -1,2 +1,32 @@
+node_modules/
 .env
-node_modules
+.DS_Store
+*.log
+dist/
+build/
+coverage/
+.nyc_output/
+.cache/
+.parcel-cache/
+temp/
+.tmp/
+.sass-cache/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+Thumbs.db
+
+# PM2
+ecosystem.config.js
+.pm2/

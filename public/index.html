@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Post Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="url"]:focus {
+            outline: none;
+            border-color: #0077b5;
+        }
+
+        .prompt-section {
+            margin-top: 30px;
+        }
+
+        .prompt-toggle {
+            background: none;
+            border: none;
+            color: #0077b5;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-bottom: 10px;
+        }
+
+        .prompt-editor {
+            display: none;
+        }
+
+        .prompt-editor.active {
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #0077b5;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .result {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #0077b5;
+        }
+
+        .result.active {
+            display: block;
+        }
+
+        .result h3 {
+            color: #0077b5;
+            margin-bottom: 15px;
+        }
+
+        .post-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .error {
+            display: none;
+            padding: 15px;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 6px;
+            border: 1px solid #f5c6cb;
+            margin-top: 20px;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .source-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LinkedIn Post Creator</h1>
+            <p>Transform your Google Docs into engaging LinkedIn posts using AI</p>
+        </div>
+
+        <div class="form-section">
+            <form id="postForm">
+                <div class="form-group">
+                    <label for="googleDocUrl">Google Docs URL</label>
+                    <input 
+                        type="url" 
+                        id="googleDocUrl" 
+                        placeholder="https://docs.google.com/document/d/your-doc-id/edit"
+                        required
+                    >
+                    <small style="color: #666; font-size: 13px; margin-top: 5px; display: block;">
+                        Make sure your Google Doc is shared with "Anyone with the link" and has view permissions
+                    </small>
+                </div>
+
+                <div class="prompt-section">
+                    <button type="button" class="prompt-toggle" id="promptToggle">
+                        Customize AI prompt (optional)
+                    </button>
+                    <div class="prompt-editor" id="promptEditor">
+                        <div class="form-group">
+                            <label for="customPrompt">Custom Prompt</label>
+                            <textarea 
+                                id="customPrompt" 
+                                placeholder="Enter your custom prompt here..."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="generate-btn" id="generateBtn">
+                    Generate LinkedIn Post
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <p>🤖 Analyzing your Google Doc and generating LinkedIn post...</p>
+                <p style="font-size: 14px; margin-top: 10px; opacity: 0.7;">This may take 10-30 seconds</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="result" id="result">
+                <h3>Generated LinkedIn Post</h3>
+                <div class="post-content" id="postContent"></div>
+                <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+                <div class="source-info" id="sourceInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const form = document.getElementById('postForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const error = document.getElementById('error');
+        const promptToggle = document.getElementById('promptToggle');
+        const promptEditor = document.getElementById('promptEditor');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // Toggle prompt editor
+        promptToggle.addEventListener('click', () => {
+            promptEditor.classList.toggle('active');
+            promptToggle.textContent = promptEditor.classList.contains('active') 
+                ? 'Hide custom prompt' 
+                : 'Customize AI prompt (optional)';
+        });
+
+        // Load default prompt
+        fetch('/api/prompt')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('customPrompt').placeholder = data.prompt || 'Enter your custom prompt here...';
+            })
+            .catch(console.error);
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const googleDocUrl = document.getElementById('googleDocUrl').value;
+            const customPrompt = document.getElementById('customPrompt').value;
+
+            // Hide previous results/errors
+            result.classList.remove('active');
+            error.classList.remove('active');
+            
+            // Show loading
+            loading.classList.add('active');
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ googleDocUrl, customPrompt })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate post');
+                }
+
+                // Show result
+                document.getElementById('postContent').textContent = data.post;
+                document.getElementById('sourceInfo').innerHTML = `
+                    <strong>Source:</strong> ${data.sourceInfo.title}<br>
+                    <strong>Word Count:</strong> ${data.sourceInfo.wordCount} words<br>
+                    <strong>Images:</strong> ${data.sourceInfo.imageCount} images
+                `;
+                result.classList.add('active');
+
+            } catch (err) {
+                // Show error
+                document.getElementById('error').textContent = err.message;
+                error.classList.add('active');
+            } finally {
+                // Hide loading
+                loading.classList.remove('active');
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate LinkedIn Post';
+            }
+        });
+
+        // Copy to clipboard
+        copyBtn.addEventListener('click', async () => {
+            try {
+                const postContent = document.getElementById('postContent').textContent;
+                await navigator.clipboard.writeText(postContent);
+                
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '#28a745';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+        });
+    </script>
+</body>
+</html>
